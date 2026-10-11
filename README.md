@@ -12,7 +12,8 @@ Move your task through **Todo → In Progress → In Review → Done**. Add issu
 ## Stack
 - Expo (managed workflow), React Native, and TypeScript
 - Expo Router for navigation
-- Firebase Firestore and Anonymous Auth; Cloud Functions only if needed
+- Supabase (Postgres, Anonymous Auth, SQL functions, pg_cron); free plan only
+- Client: `@supabase/supabase-js`
 - Optional data/ML: Python, pandas, and scikit-learn
 
 ## Team
