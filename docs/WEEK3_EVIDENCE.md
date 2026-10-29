@@ -2,6 +2,8 @@
 
 Recorded October 29, 2026. This is a current update, not a claim that the October 23 checkpoint was met.
 
+Draft follow-up: [PR #13](https://github.com/KappaThetaPiUTD/queueless/pull/13), branch `feature/punit-week3-integration`, based on the existing [PR #8](https://github.com/KappaThetaPiUTD/queueless/pull/8) branch. Merge/review the follow-up into #8 before #8 goes to main. Neither PR was merged during this work.
+
 ## Done
 
 - Enabled local anonymous sign-ins.

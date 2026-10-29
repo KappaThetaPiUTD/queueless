@@ -2,6 +2,8 @@
 
 Your job is to make the existing backend safe to use, then give Harsha and Krish simple TypeScript functions for their screens. You do not need to build the whole app. The pasted issue's October 23 checkpoint has already passed as of October 29; report current progress and blockers honestly.
 
+The prepared changes are in [draft PR #13](https://github.com/KappaThetaPiUTD/queueless/pull/13), a follow-up targeting the existing PR #8 branch. Backend tests and the real-client smoke check pass; teammate review and frontend phone integration remain pending.
+
 ## The words in the assignment
 
 - **Backend:** the database, login, and rules behind the app.
