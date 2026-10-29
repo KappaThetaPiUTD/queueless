@@ -7,7 +7,7 @@ Aligned proposed tables: `locations`, `reports`, `hourly_summaries` (see `docs/D
 Column conventions: `location_id`, `crowd_level`, `wait_minutes`, `user_id`, `created_at`.
 
 **Week 1 implement:** `submit_report`, `get_location_status`  
-**Week 1 design / Week 2 implement:** `get_all_statuses`, `get_location_history`, `refresh_hourly_summaries`
+**Week 3 implement:** `get_all_statuses`, typed client services. History and hourly refresh remain future work.
 
 ---
 
@@ -51,7 +51,7 @@ Same weights on non-null `wait_minutes`. If no report in the window has a wait, 
 | --- | --- |
 | Zero reports in the last 60 minutes | `none` |
 | ≥ 3 reports **and** mean weight ≥ 0.75 | `high` |
-| ≥ 2 reports **or** mean weight ≥ 0.5 | `medium` |
+| ≥ 2 reports (after the high-confidence rule) | `medium` |
 | Otherwise | `low` |
 
 Mean weight = \(\frac{\sum w_i}{n}\). When `confidence` is `none`, `crowd_level`, `estimated_wait_minutes`, and `last_updated` are `null`; `report_count` is `0`.
@@ -121,7 +121,7 @@ Errors from RPCs surface as Postgres `raise exception` with `ERRCODE` / message;
 
 ## `submit_report`
 
-Validates input, enforces a **10-minute** per-user / per-location limit, inserts a row into `reports`, returns the new report id.
+Validates input, enforces a **10-minute** per-user / per-location limit, inserts a row into `reports`, returns the new report id. A transaction-scoped advisory lock on the user/location pair serializes concurrent requests before checking the limit. Independent pairs remain allowed. The lock is released on commit or rollback; Supabase RPCs use READ COMMITTED transactions.
 
 ### Authorized callers
 
@@ -132,9 +132,9 @@ Validates input, enforces a **10-minute** per-user / per-location limit, inserts
 
 | Name | Type | Required | Rules |
 | --- | --- | --- | --- |
-| `p_location_id` | `uuid` | yes | Must exist in `locations` |
+| `p_location_id` | `uuid` | yes | Must exist and be active in `locations` |
 | `p_crowd_level` | `text` | yes | One of `low`, `medium`, `high` |
-| `p_wait_minutes` | `integer` | no | If present: integer 0–180 inclusive |
+| `p_wait_minutes` | `integer` | no | If present: integer 0–120 inclusive |
 
 ### Success output (example)
 
@@ -218,9 +218,9 @@ Returns the live estimate for one location using the estimator above.
 
 ---
 
-## `get_all_statuses` (design — Week 2 implement)
+## `get_all_statuses` (implemented — Week 3)
 
-Returns statuses for **every** location in one call for Home. Do **not** call `get_location_status` once per card.
+Returns statuses for **every active** location in one call for Home. Do **not** call `get_location_status` once per card.
 
 ### Authorized callers
 
@@ -353,7 +353,7 @@ select cron.schedule(
 
 1. Enable RLS on `locations`, `reports`, `hourly_summaries`.
 2. Clients insert reports **only** through `submit_report` (no direct insert of arbitrary `user_id`).
-3. Prefer `SECURITY DEFINER` functions with `set search_path = public` (or empty + qualified names), then `revoke execute from public` and grant to intended roles.
+3. Aggregate/status and submission RPCs require privileged table access because raw reports are private. They use `SECURITY DEFINER`, an empty search path, qualified table names, explicit execution grants, and `auth.uid()` for writes. Do not expose raw rows through another RPC.
 4. Never ship the `service_role` key in the Expo app.
 
 ---

@@ -4,6 +4,10 @@ QueueLess helps students check how busy a campus place is before walking there, 
 
 A Kappa Theta Pi pledge project at UT Dallas. Final demo: December 3, 2026.
 
+## Punit's Week 3 handoff
+
+Start with [the plain-English task guide](docs/PUNIT_WEEK3_GUIDE.md) for what is implemented, what needs teammates, setup commands, and the live-demo checklist. Current validation is recorded in [Week 3 evidence](docs/WEEK3_EVIDENCE.md).
+
 ## Team board
 [Open the QueueLess project board](https://github.com/users/Mxs8513/projects/3) to track tasks and post progress updates. All Week 1 tasks are due October 9, 2026.
 
