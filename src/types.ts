@@ -11,6 +11,9 @@ export interface Location {
   latitude?: number;
   longitude?: number;
   openHours?: string;
+  building: string | null;
+  floorOrArea: string | null;
+  isActive: boolean;
 }
 
 export interface Report {
@@ -19,7 +22,8 @@ export interface Report {
   /** ISO timestamptz from Postgres, or ms since epoch if normalized client-side */
   createdAt: string | number;
   crowdLevel: CrowdLevel;
-  waitMinutes?: number;
+  /** Optional integer from 0 through 120; null means no wait supplied. */
+  waitMinutes?: number | null;
   userId: string; // Supabase Auth anonymous uid
 }
 
@@ -40,4 +44,29 @@ export interface LocationStatusRow {
   confidence: Confidence;
   last_updated: string | null;
   report_count: number;
+}
+
+export interface SubmitReportInput {
+  locationId: string;
+  crowdLevel: CrowdLevel;
+  waitMinutes?: number | null;
+}
+
+export interface SubmittedReport {
+  id: string;
+  locationId: string;
+  crowdLevel: CrowdLevel;
+  waitMinutes: number | null;
+  createdAt: string;
+}
+
+export type ServiceErrorCode = 'network' | 'location_not_found' | 'invalid_input'
+  | 'rate_limited' | 'not_authenticated' | 'configuration' | 'unexpected';
+
+export interface QueueLessService {
+  initializeSession(): Promise<void>;
+  getLocations(): Promise<Location[]>;
+  getAllStatuses(): Promise<CrowdEstimate[]>;
+  getLocationStatus(locationId: string): Promise<CrowdEstimate>;
+  submitReport(input: SubmitReportInput): Promise<SubmittedReport>;
 }

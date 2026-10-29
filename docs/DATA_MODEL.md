@@ -13,6 +13,9 @@ This file proposes table/column names so `docs/API.md` and migrations can stay a
 | `latitude` | `float8` nullable | |
 | `longitude` | `float8` nullable | |
 | `open_hours` | `text` nullable | |
+| `building` | `text` nullable | Unverified until confirmed by team |
+| `floor_or_area` | `text` nullable | Unverified until confirmed by team |
+| `is_active` | `boolean` not null default true | Home/status/submission use active locations |
 | `created_at` | `timestamptz` | |
 
 ### `reports`
@@ -22,7 +25,7 @@ This file proposes table/column names so `docs/API.md` and migrations can stay a
 | `location_id` | `uuid` FK → locations | |
 | `user_id` | `uuid` FK → auth.users | Always from `auth.uid()` via RPC |
 | `crowd_level` | enum `low\|medium\|high` | |
-| `wait_minutes` | `int` nullable | 0–180 if present |
+| `wait_minutes` | `int` nullable | 0–120 if present |
 | `created_at` | `timestamptz` | |
 
 ### `hourly_summaries`
@@ -38,7 +41,7 @@ This file proposes table/column names so `docs/API.md` and migrations can stay a
 
 ## RLS summary
 - `locations`, `hourly_summaries`: public read
-- `reports`: public read; **no client INSERT/UPDATE/DELETE** — only `submit_report`
+- `reports`: no client SELECT/INSERT/UPDATE/DELETE; aggregate reads and identity-derived writes use the restricted RPCs.
 - Writes to summaries: `refresh_hourly_summaries` (service/cron) in Week 2
 
 ## Confidence
